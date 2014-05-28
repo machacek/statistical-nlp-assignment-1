@@ -1,0 +1,274 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage{graphicx}
+%\usepackage{times}
+\usepackage{multirow}
+
+\title{Statistické metody \\ Domací úkol}
+
+\author{Matouš Macháček \\
+  {\tt machacekmatous@gmail.com} }
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Data}
+
+Pro účely domácího úkolu byly dodány dva soubory: Pro češtinu to byl soubor \texttt{TEXT1CZ.txt},
+který obsahoval $222412$ tokenů. Pro angličtinu byl použit soubor \texttt{TEXT1EN.txt}, který
+obsahoval $221098$ tokenů. Různé 
+statistiky spočítané z těchto souborů se nacházejí v tabulce \ref{data}.
+
+\begin{figure}
+    \begin{center}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        & Czech & English \\
+        \hline
+        \input{results-stats.table}
+        \hline
+    \end{tabular}
+    \end{center}
+    \caption{Comparing Czech and English language}
+    \label{data}
+\end{figure}
+
+Pro další srovnání textů jsme spočítali, kolik se vyskytuje slov s danou četností. Výsledky
+jsou zanesené do grafu \ref{zipf}.
+
+\begin{figure}
+    \includegraphics{results-zipf.pdf}
+    \caption{Count of words with a given frequency}
+    \label{zipf}
+\end{figure}
+
+\section{Entropie textu}
+
+V tomto experimentu měříme podmíněnou entropii v textu pro dané předchozí slovo. To je počítáno pomocí skriptu 
+\texttt{entropy-experiment.pl} a modulu \texttt{LanguageEntropy.pm}. Výsledky jsou v tabulce \ref{entropy-basic-results}
+
+\begin{figure}
+    \begin{center}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        File & Entropy & Perplexity \\
+        \hline
+        \texttt{TEXT1CZ.txt} & 4.748 & 26.871 \\
+        \texttt{TEXT1EN.txt} & 5.287 & 39.043 \\
+        \hline
+    \end{tabular}
+    \end{center}
+    \caption{Conditional entropy basic results }
+    \label{entropy-basic-results}
+\end{figure}
+
+\subsection{Náhodná změna slov}
+
+V další části experimentu jsme každé slovo v textu s určitou pravděpodobností změnili za libovolné jiné slovo. 
+Pak jsme sledovali, jak se mění podmíněná entropie v závislosti na pravděpodobnosti, se kterou jsme měnili slova.
+V tabulce \ref{results-entropy-words} se nacházejí výsledky z tohoto experimentu. Pro kažkou hodnotu pravděpodobnosti,
+jsme entropii změřili desetkrát. V tabulce je tedy minimální, průměrná a maximální entropie z těchto deseti měření.
+
+V grafech \ref{results-entropy-CZ} a \ref{results-entropy-EN} jsou tato data znázorněna červenými body (zeleně jsou 
+znázorněny data z dalšího experimentu).
+
+\begin{figure}
+    \begin{center}
+    \begin{tabular}{|l|ccc|ccc|}
+        \hline
+               & \multicolumn{3}{|c|}{Czech} & \multicolumn{3}{|c|}{English} \\
+        Rate of changed words & min & avg & max & min & avg & max \\
+        \hline
+        \input{results-entropy-words.table}
+        \hline
+    \end{tabular}
+    \end{center}
+    \caption{Entropy of the texts, where the words were changed with the given probabilities}
+    \label{results-entropy-words}
+\end{figure}
+
+
+\begin{figure}
+    \includegraphics{results-entropy-CZ.pdf}
+    \caption{Entropy of the Czech text, where the items were changed with the given probabilities}
+    \label{results-entropy-CZ}
+\end{figure}
+
+\begin{figure}
+    \includegraphics{results-entropy-EN.pdf}
+    \caption{Entropy of the English text, where the items were changed with the given probabilities}
+    \label{results-entropy-EN}
+\end{figure}
+
+Z grafů plyne, že pokud zvyšujeme pravděpodobnost záměny slov, bude se entropie zvyšovat pro angličtinu,
+ale pro češtinu se bude snižovat. Myslím, že by se to dalo vysvětlit grafem \ref{zipf}. V češtině se slovo zamění většinou
+na nějaké málo frekventované. Naopak v angličtině se slovo zamění s větší pravděpodobností na nějake častější slovo. Tím 
+se distribuce pravděpodobností stává více uniformní a entropie se zvyšuje.
+
+\subsection{Náhodná změna znaků}
+
+Podobně, jako jsme měnili slova s určitou pravděpodobností, tak jsme také náhodně měnili jednotlivé znaky. 
+Výsledky z toho experimentu se nacházejí v tabulce \ref{results-entropy-chars}. Vizuálně jsou tyto výsledky
+znázorněny zeleně v grafech \ref{results-entropy-CZ} a \ref{results-entropy-EN} (tentokrát rozděleno podle
+jazyka).
+
+\begin{figure}
+    \begin{center}
+    \begin{tabular}{|l|ccc|ccc|}
+        \hline
+               & \multicolumn{3}{|c|}{Czech} & \multicolumn{3}{|c|}{English} \\
+        Rate of changed chars & min & avg & max & min & avg & max \\
+        \hline
+        \input{results-entropy-chars.table}
+        \hline
+    \end{tabular}
+    \end{center}
+    \caption{Entropy of the texts, where the characters were changed with the given probabilities}
+    \label{results-entropy-chars}
+\end{figure}
+
+U tohoto experimentu klesají entropie u obou jazyků. Na rozdíl od předchozího experimentu, tady
+dochází k záměně na úplně nová slova. Zvyšuje se velikost slovníku a přitom délka textu zůstává stejná.
+Je spousta slov, která jsou viděna pouze jednou a která jednoznačně určují následující slovo. To snižuje
+entropii.
+
+Poznamenejme ještě, že pokud bychom zaměnili každý znak, byla by entropie nejnižší. To však platí pouze
+pro danou délku textu. Pokud bychom text prodlužovali, entropie by se postupně zvyšovala (protože by
+se začala opakovat slovat a už by neurčovala jednoznačně svého následníka).
+
+\subsection{Teoretické cvičení}
+
+Nechť množiny $I_1$, $J_1$, $I_2$, $J_2$ jsou množiny z definice entropie textů $T_1$ a $T_2$.
+Můžeme pak množiny $I$ a $J$ vyjádřit jako jejich disjunktní sjednocení:
+
+\begin{equation}
+    I = I_1 \cup I_2
+\end{equation}
+
+\begin{equation}
+    J = J_1 \cup J_2
+\end{equation}
+
+Výpočet podmíněné entropie podle definice
+\begin{equation}
+H(J|I) =-\sum_{i \in I, j \in J} P(i,j) log_2 P(j|i)
+\end{equation}
+
+Můžeme přepsat takto:
+\begin{equation}
+H(J|I) = K(J_1|I_1) + K(J_2|I_2) + K(J_1|I_2) + K(J_2|I_1)
+\label{rovK}
+\end{equation}
+
+kde
+\begin{equation}
+    K(A|B) = -\sum_{i \in B, j \in A} P(i,j) log_2 P(j|i)
+\end{equation}
+
+%Pro $i \in I_1$ a $j \in J_2$ neexistuje žádný bigram $(i,j)$
+%a tedy $P(i,j)=0$. To se však vyskytuje v sumě $K(J_1|I_2)$
+%a tedy $K(J_1|I_2) = 0$. 
+%Nejdříve ukážeme, že $K(J_1|I_2)=K(J_2|I_1)=0$. Pro každou
+
+Dále pro $i \in I_1$ a $j \in J_1$ platí:
+\begin{equation}
+    P(i,j) = \frac{C(i,j)}{2L} = \frac{1}{2} \frac{C(i,j)}{L} = \frac{1}{2} P_1(i,j)
+\end{equation}
+
+To a zřejmý fakt, že $P(j|i) = P_1(j|i)$ použijeme v následujícím vyjádření:
+\begin{eqnarray}
+    K(J_1|I_1) & =& -\sum_{i \in I_1, j \in J_1} P(i,j) log_2 P(j|i) \\
+    & = & -\sum_{i \in I_1, j \in J_1} \frac{1}{2} P_1(i,j) log_2 P_1(j|i) \\
+    & = & \frac{1}{2} E
+\end{eqnarray}
+
+Podobně bychom dospěli k tomuto:
+\begin{equation}
+    K(J_1|I_1) = \frac{1}{2} E
+\end{equation}
+
+Dosazením do \ref{rovK} pak dostáváme:
+\begin{equation}
+H(J|I) = \frac{1}{2} E + \frac{1}{2} E + K(J_1|I_2) + K(J_2|I_1) = E + K(J_1|I_2) + K(J_2|I_1)
+\end{equation}
+
+Víme, že oba sčítance $K(J_1|I_2)$ a $K(J_2|I_1)$ jsou nezáporné, protože je nezáporný každý sčítanec sumy.
+Tím jsme tedy dokázali, že
+\begin{equation}
+    H(J|I) \geq E
+\end{equation}
+
+\section{Jazykový model}
+
+Úkolem druhé části domácího úkolu bylo natrénovat trigramový jazykový model. K tomu jsme použili skript 
+\texttt{language-model-experiment.pl} a model \texttt{LanguageModel.pm}. 
+
+Oba texty byly rozděleny takto: posledních 20 000 tokenů bylo z každého souboru odstraněno abychom z nich mohli
+vytvořit testset. Potom bylo odebráno dalších 40 000 tokenů z konce jako heldout data. Zbytek 
+jsme použili jako trainset.
+
+Pomocí trainsetu jsme natrénovali (metodou MLE) unigramový, bigramový a trigramový model. Dále jsme pomocí heldout
+setu natrénovali (metodou EM) lambda koeficienty. Tím jsme získali interpolovaný a vyhlazený trigramový model.
+Na testsetu jsme dosáhli hodnoty Cross-entropy $10.221$ pro češtinu a $7.468$ pro angličtinu.
+
+Zkoušeli jsme také trénovat lambdy na trainsetu. Podle předpokladu šel koeficient trigramového modelu rychle k jedničce a ostatní
+koeficienty naopak klesali rychle k nule. Log z tohoto trénování se nachází v souborech \texttt{languagemodel.CZ.log} a 
+\texttt{languagemodel.EN.log}. 
+
+\subsection{Ladění koeficientu trigramového modelu}
+
+V další části experimentu jsme zkoušeli měnit postupně parametr $\lambda_3$ a dívali jsme se, jak se mění Cross-Entropy na testsetu. 
+Tyto výsledky jsou znázorněny v grafu \ref{results-model} a v tabulkách \ref{results-model-CZ} a \ref{results-model-EN}.
+
+\begin{figure}
+    \includegraphics{results-model.pdf}
+    \caption{Graph of entropies for English text.}
+    \label{results-model}
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+    \begin{tabular}{|l|c|}
+        \hline
+        $\lambda_3$ & Cross-Entropy \\
+        \hline
+        \input{results-model-CZ.table}
+        \hline
+    \end{tabular}
+    \end{center}
+    \caption{Cross-Entropy of Czech language model computed on testset with the given lambdas}
+    \label{results-model-CZ}
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+    \begin{tabular}{|l|c|}
+        \hline
+        $\lambda_3$ & Cross-Entropy \\
+        \hline
+        \input{results-model-EN.table}
+        \hline
+    \end{tabular}
+    \end{center}
+    \caption{Cross-Entropy of English language model computed on testset with the given lambdas}
+    \label{results-model-EN}
+\end{figure}
+
+Z grafu je vidět, že EM algoritmus určil optimální hodnotu $\lambda_3$ správně. Tato hodnota je pro oba jazyky podobná. 
+Když se parametr blíží k jedničce, Cross-Entropy rychle stoupá. To by se dalo vysvětlit tím, že trénovací množina je relativně
+malá a trigramový model je tím pádem málo robustní. Na tomto je vidět, jak důležité vyhlazování jazykového modelu.
+
+Pokud naopak nastavíme parametr na nulu (a tedy trigramový model
+vůbec nevyužíváme), Cross-Entropy se zvýší jen mírně. Dalo by se to tedy říct i tak, že na daných trénovacích datech si trigramovým
+modelem oproti bigramovému moc nepomůžeme. Dalo by se předpokládat, že čtyřgramovým modelem bychom si pomohli ješte méně.
+
+Nakonec je v tomto grafu vidět, že pro češtinu jsou hodnoty Cross-Entropy znatelně vyšší. To by se dalo vysvětlit tím, že v českém 
+textu se vyskytuje přibližně čtyřikrát více různých slov a český model má tedy daleko více parametrů. Pří podobné velikosti trénovacích
+dat pak musí být český model méně robustní. Další možné vysvětlení je, že v češtině je volný slovosled a narozdíl od angličtiny je tedy
+težší předpovídat následující slova.
+
+\end{document}
